@@ -1,6 +1,7 @@
 import React from 'react'
 import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
-
+import {Provider} from 'react-redux'
+import store from './store'
 
 import Activate from './containers/Activate';
 import Home from './containers/Home';
@@ -13,7 +14,7 @@ import Layout from './hocs/Layout';
 
 function App() {
   return (
-    <>
+    <Provider store={store}>
       <Router>
         <Layout>
           <Switch>
@@ -26,8 +27,8 @@ function App() {
           </Switch>
         </Layout>
       </Router>
-    </>
-  );
+    </Provider>
+  )
 }
 
 export default App;
