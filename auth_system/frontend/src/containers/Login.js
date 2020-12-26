@@ -8,11 +8,14 @@ const Login = ({login, isAuthenticated}) => {
         email:'',
         password:''
     })
+    const [loginError, setLoginError] = useState(false)
+    
     const {email, password} = formData
     const onChange = e => setFormData({...formData, [e.target.name]: e.target.value})
     const onSubmit = e => {
         e.preventDefault()
         login(email, password)
+        if (isAuthenticated==false) setLoginError(true)
     }
 
     // Is user uthenticated ?
@@ -51,12 +54,14 @@ const Login = ({login, isAuthenticated}) => {
                 </div>
                 <button className='btn btn-primary' type='submit'>Login</button>
             </form>
+            {loginError?<p>Wrong username or password</p>:''}
             <p className='mt-3'>
                 Don't have an account ? <Link to='/signup'>Sign Up</Link>
             </p>
             <p className='mt-3'>
                 Forgot your password ? <Link to='/reset-password'>Reset Password</Link>
             </p>
+            
         </div>
     )
 }

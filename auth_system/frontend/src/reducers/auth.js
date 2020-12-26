@@ -9,7 +9,11 @@ import {
     PASSWORD_RESET_CONFIRM_FAIL,
     PASSWORD_RESET_CONFIRM_SUCCESS,
     PASSWORD_RESET_FAIL,
-    PASSWORD_RESET_SUCCESS
+    PASSWORD_RESET_SUCCESS,
+    SIGNUP_FAIL,
+    SIGNUP_SUCCESS,
+    ACTIVATE_FAIL,
+    ACTIVATE_SUCCCESS
 } from '../actions/types'
 
 const initialState = {
@@ -22,6 +26,12 @@ const initialState = {
 export default function(state=initialState, action){
     const {type, payload} = action
     switch(type){
+        case SIGNUP_SUCCESS:
+            return{
+                ...state,
+                isAuthenticated:false
+            } 
+
         case AUTHENTICATED_SUCCESS:
             return{
                 ...state,
@@ -55,6 +65,7 @@ export default function(state=initialState, action){
             }
         case LOGOUT:
         case LOGIN_FAIL:
+        case SIGNUP_FAIL:
             localStorage.removeItem('access')
             localStorage.removeItem('refresh')
             return{
@@ -67,6 +78,8 @@ export default function(state=initialState, action){
         case PASSWORD_RESET_CONFIRM_SUCCESS:
         case PASSWORD_RESET_FAIL:
         case PASSWORD_RESET_SUCCESS:
+        case ACTIVATE_SUCCCESS:
+        case ACTIVATE_FAIL:
             return{
                 ...state
             }

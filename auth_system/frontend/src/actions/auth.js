@@ -10,8 +10,51 @@ import {
     PASSWORD_RESET_CONFIRM_FAIL,
     PASSWORD_RESET_CONFIRM_SUCCESS,
     PASSWORD_RESET_FAIL,
-    PASSWORD_RESET_SUCCESS
+    PASSWORD_RESET_SUCCESS,
+    SIGNUP_FAIL,
+    SIGNUP_SUCCESS,
+    ACTIVATE_FAIL,
+    ACTIVATE_SUCCCESS
 } from './types'
+
+export const signup = (name, email, password, re_password) => async dispatch => {
+    const config = {
+        headers:{
+            'Content-Type':'application/json'
+        }
+    }
+    const body = JSON.stringify({name, email, password, re_password})
+    try{
+        const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/users/`, body, config)
+        dispatch({
+            type: SIGNUP_SUCCESS,
+            payload: res.data
+        })
+    }catch(err){
+        dispatch({
+            type: SIGNUP_FAIL
+        })
+    }
+}
+
+export const verify = (uid, token) => async dispatch => {
+    const config = {
+        headers:{
+            'Content-Type':'application/json'
+        }
+    }
+    const body = JSON.stringify({uid,token})
+    try{
+        const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/users/activation/`, body, config)
+        dispatch({
+            type: ACTIVATE_SUCCCESS,
+        })
+    }catch(err){
+        dispatch({
+            type: ACTIVATE_FAIL
+        })
+    }
+}
 
 
 export const checkAuthenticated = () => async dispatch => {
