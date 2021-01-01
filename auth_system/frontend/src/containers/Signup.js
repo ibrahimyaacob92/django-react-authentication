@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 import {Link, Redirect} from 'react-router-dom'
 import {connect} from 'react-redux'
 import {signup} from '../actions/auth'
+import axios from 'axios'
 
 const Signup = ({signup, isAuthenticated}) => {
     const [accountCreated, setaccountCreated] = useState(false)
@@ -18,6 +19,26 @@ const Signup = ({signup, isAuthenticated}) => {
         if (password === re_password){
             signup(name, email, password, re_password)
             setaccountCreated(true)
+        }
+    }
+
+    const continueWithGoogle = async () => {
+        try{
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/o/google-oauth2/?redirect_uri=${process.env.REACT_APP_API_URL}/google`)
+            window.location.replace(res.data.authorization_url)
+            console.log(res.request)
+        }catch(error){
+            console.log(error)
+        }
+    }
+
+    const continueWithFacebook = async () => {
+        try{
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/o/facebook-oauth2/?redirect_uri=${process.env.REACT_APP_API_URL}/facebook`)
+            window.location.replace(res.data.authorization_url)
+        
+        }catch(error){
+            console.log(error)
         }
     }
 
@@ -83,6 +104,8 @@ const Signup = ({signup, isAuthenticated}) => {
                 </div>
                 <button className='btn btn-primary' type='submit'>Signup</button>
             </form>
+            <button className ='btn btn-danger mt3' onClick={continueWithGoogle}>Continue with Google</button>
+            <button className ='btn btn-primary mt3' onClick={continueWithFacebook}>Continue with Facebook</button>
             <p className='mt-3'>
                 Forgot your password ? <Link to='/reset-password'>Reset Password</Link>
             </p>

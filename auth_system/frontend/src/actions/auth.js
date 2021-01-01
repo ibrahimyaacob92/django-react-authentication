@@ -14,7 +14,11 @@ import {
     SIGNUP_FAIL,
     SIGNUP_SUCCESS,
     ACTIVATE_FAIL,
-    ACTIVATE_SUCCCESS
+    ACTIVATE_SUCCCESS,
+    GOOGLE_AUTH_FAIL,
+    GOOGLE_AUTH_SUCCESS,
+    FACEBOOK_AUTH_SUCCESS,
+    FACEBOOK_AUTH_FAIL
 } from './types'
 
 export const signup = (name, email, password, re_password) => async dispatch => {
@@ -36,6 +40,8 @@ export const signup = (name, email, password, re_password) => async dispatch => 
         })
     }
 }
+
+
 
 export const verify = (uid, token) => async dispatch => {
     const config = {
@@ -196,4 +202,71 @@ export const logout = () => dispatch => {
     dispatch({
         type: LOGOUT
     })
+}
+
+export const googleAuthenticate = (state, code) => async dispatch => {
+    // if we have state and code but no access token then we will authenticate with google
+    if (state && code && !localStorage.getItem('access')){
+        const config = {
+            headers:{
+                'Content-Type':'application/x-www-form-urlencoded'
+            }
+        }
+
+        const details = {
+            'state':state,
+            'code':code
+        }
+
+        const formBody = Object.keys(details).map(key => encodeURIComponent(key) + '=' + encodeURIComponent(details[key])).join('&')
+
+        try {
+            const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/o/google-oauth2/?${formBody}`,config)
+            dispatch({
+                type: GOOGLE_AUTH_SUCCESS,
+                payload: res.data
+            })
+
+            dispatch(load_user())
+        } catch (error) {
+            console.log(error)
+            dispatch({
+                type: GOOGLE_AUTH_FAIL
+            })
+        }
+    }   
+}
+
+
+export const facebookAuthenticate = (state, code) => async dispatch => {
+    // if we have state and code but no access token then we will authenticate with google
+    if (state && code && !localStorage.getItem('access')){
+        const config = {
+            headers:{
+                'Content-Type':'application/x-www-form-urlencoded'
+            }
+        }
+
+        const details = {
+            'state':state,
+            'code':code
+        }
+
+        const formBody = Object.keys(details).map(key => encodeURIComponent(key) + '=' + encodeURIComponent(details[key])).join('&')
+
+        try {
+            const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/o/facebook/?${formBody}`,config)
+            dispatch({
+                type: FACEBOOK_AUTH_SUCCESS,
+                payload: res.data
+            })
+
+            dispatch(load_user())
+        } catch (error) {
+            console.log(error)
+            dispatch({
+                type: FACEBOOK_AUTH_FAIL
+            })
+        }
+    }   
 }

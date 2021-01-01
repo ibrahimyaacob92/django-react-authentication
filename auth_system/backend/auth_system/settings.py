@@ -27,7 +27,7 @@ SECRET_KEY = 'a+^xu8ecla=x=tzt0*#h*#5rfdrd$9oh+w_rg1$a0m)#umt^3*'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost','127.0.0.1']
 
 
 # Application definition
@@ -42,10 +42,17 @@ INSTALLED_APPS = [
     'rest_framework',
     'djoser',
     'accounts',
+
+    # for social django
+    'social_django',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [
+    'social_django.middleware.SocialAuthExceptionMiddleware',   # for social integration
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -67,6 +74,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # for django
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -150,17 +160,26 @@ DJOSER = {
     'EMAIL_RESET_CONFIRM_URL':'email/reset/confirm/{uid}/{token}',
     'ACTIVATION_URL':'activate/{uid}/{token}',
 
+    # social integration
+    'SOCIAL_AUTH_TOKEN_STRATEGY':'djoser.social.token.jwt.TokenStrategy',
+    'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS':['http://localhost:8000/google','http://localhost:8000/facebook', ],
     'SERIALIZERS':{
         'user_create':'accounts.serializers.UserCreateSerializer',
         'user':'accounts.serializers.UserCreateSerializer',
-        'user_delete':'accounts.serializers.UserDeleteSerializer',
+        'user_delete':'djoser.serializers.UserDeleteSerializer',
+        'current_user':'accounts.serializers.UserCreateSerializer',
     }
 }
+
 
 SIMPLE_JWT = {
     'AUTH_HEADER_TYPES':('JWT',),
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    # for social
+    'AUTH_TOKEN_CLASSES':(
+        'rest_framework_simplejwt.tokens.AccessToken',
+    )
 }
 
 REST_FRAMEWORK = {
@@ -176,3 +195,38 @@ REST_FRAMEWORK = {
 
 AUTH_USER_MODEL = 'accounts.UserAccount'
 
+# for social app
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',     # authenticate with social
+    'social_core.backends.facebook.FacebookOAuth2',
+    'django.contrib.auth.backends.ModelBackend',    # default authentication by django
+)
+
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '865290645886-n42rgki8o5trika817dqu7i5age9l7uj.apps.googleusercontent.com'  # get from google
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'Bj508RVx_-wkG_GiyHQpZf7K'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+    'openid',
+    ]
+SOCIAL_AUTH_GOOGLE_OAUTH2_EXTRA_DATA = [
+    'first_name',
+    'last_name',
+]
+
+SOCIAL_AUTH_FACEBOOK_KEY = '161041882054194'
+SOCIAL_AUTH_FACEBOOK_SECRET = '1a0e7661c68e785660f21e9e5bcf1e18'
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
+SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
+    'fields':'email, first_name, last_name'
+}
+# SOCIAL_AUTH_FACEBOOK_EXTRA_DATA = [
+#     ('email','email')
+# ]
+
+CORS_ORIGIN_ALLOW_ALL = False
+
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:8000',
+)

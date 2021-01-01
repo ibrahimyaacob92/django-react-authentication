@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 import {Link, Redirect} from 'react-router-dom'
 import {connect} from 'react-redux'
 import {login} from '../actions/auth'
+import axios from 'axios'
 
 const Login = ({login, isAuthenticated}) => {
     const [formData, setFormData] = useState({
@@ -16,6 +17,27 @@ const Login = ({login, isAuthenticated}) => {
         e.preventDefault()
         login(email, password)
         if (isAuthenticated==false) setLoginError(true)
+    }
+
+    const continueWithGoogle = async () => {
+        try{
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/o/google-oauth2/?redirect_uri=${process.env.REACT_APP_API_URL}/google`)
+            console.log(res)
+            window.location.replace(res.data.authorization_url)
+        
+        }catch(error){
+            console.log(error)
+        }
+    }
+
+    const continueWithFacebook = async () => {
+        try{
+            const res = await axios.get(`${process.env.REACT_APP_API_URL}/auth/o/facebook/?redirect_uri=${process.env.REACT_APP_API_URL}/facebook`)
+            window.location.replace(res.data.authorization_url)
+        
+        }catch(error){
+            console.log(error)
+        }
     }
 
     // Is user uthenticated ?
@@ -55,6 +77,8 @@ const Login = ({login, isAuthenticated}) => {
                 <button className='btn btn-primary' type='submit'>Login</button>
             </form>
             {loginError?<p>Wrong username or password</p>:''}
+            <button className ='btn btn-danger mt3' onClick={continueWithGoogle}>Continue with Google</button>
+            <button className ='btn btn-primary mt3' onClick={continueWithFacebook}>Continue with Facebook</button>
             <p className='mt-3'>
                 Don't have an account ? <Link to='/signup'>Sign Up</Link>
             </p>
