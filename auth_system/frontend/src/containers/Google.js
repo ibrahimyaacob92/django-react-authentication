@@ -5,7 +5,7 @@ import { googleAuthenticate } from '../actions/auth'
 import queryString from 'query-string'
 
 
-const Facebook = ({ googleAuthenticate }) => {
+const Google = ({ googleAuthenticate }) => {
   let location = useLocation();
 
   useEffect(() => {
@@ -36,4 +36,4 @@ const Facebook = ({ googleAuthenticate }) => {
   )
 }
 
-export default connect(null, { googleAuthenticate })(Facebook)
+export default connect(null, { googleAuthenticate })(Google)
